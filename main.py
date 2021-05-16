@@ -10,7 +10,7 @@ MIN_MATCH_COUNT = 8
 FLANN_INDEX_KDTREE = 1
 
 
-def rotationMatrixToEulerAngles(R) :
+def rotationMatrixToEulerAngles(R):
     sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
 
     singular = sy < 1e-6
@@ -60,13 +60,12 @@ def getTransformation(ref_img, query_img):
                       [0, fy, cy],
                       [0, 0, 1]])
 
-        src_pts = np.float32([ref_kp[m.queryIdx].pt for m in best_matches]).reshape(-1, 1, 2)
-        dst_pts = np.float32([q_kp[m.trainIdx].pt for m in best_matches]).reshape(-1, 1, 2)
+        src_pts = np.float32([ref_kp[m.queryIdx].pt for m in best_matches])
+        dst_pts = np.float32([q_kp[m.trainIdx].pt for m in best_matches])
 
-        # Least Mean Square, RANSAC threshold is hard to find
         E, mask = cv2.findEssentialMat(src_pts, dst_pts, K, method=cv2.RANSAC,  prob=0.999)
 
-        points, R_est, t_est, mask_pose = cv2.recoverPose(E, src_pts, dst_pts)
+        points, R_est, t_est, mask_pose = cv2.recoverPose(E, src_pts, dst_pts, K)
 
         # extrinsic matrix
         # ext_mat = np.hstack((R_est, t_est))
